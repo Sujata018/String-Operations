@@ -19,19 +19,25 @@ Example: if dp=['3','35',356'], binarySearch(0,2,'6') returns 1, the index of '3
 Assumption: dp array should be sorted in ascending order of the last characters of the strings populated in each index.
 '''
 def binarySearch(low,high,x):
-   if low > high:
-      return 0        # Not found
-   if low+1>=high:
-      return low      # found
+
    if dp[high][-1]<x: # all elements are lower 
       return high
-   if dp[low][-1]>=x:  # all elements are higher
+   if dp[low][-1]>x:  # all elements are higher
+      return low-1
+   if dp[low][-1]==x:  # x=low element. x can not form best IS
       return -1
+   if low > high:
+      return -1        # Not found
+   if low+1>=high:
+      return low      # found
    
    mid = (low+high)//2
    if dp[mid][-1] < x:# mid is lower, search in range [mid, high]
       return binarySearch(mid,high,x)
-   else:              # mid is higher, search in range [low,mid]
+   elif dp[mid][-1] == x: # if mid is equal, x can not form best IS
+      return -1
+   else:
+      # mid is higher, search in range [low,mid]
       return binarySearch(low,mid-1,x)
 
 '''
@@ -63,59 +69,25 @@ Time complexity: O(n log n)
                  Read each integer sequentially -> O(n), binary search to find last IS lower than current -> O(log n). 
 '''
 def LIS():
-   global dp,s                # Global variables to store dynamic programming array and input string 
+   global dp,s                            # Global variables to store dynamic programming array and input string 
 
-   k=0                        # index of the largest string in dp array
+   k=0                                    # index of the largest string in dp array
 
-   for i in range(len(s)):    # read each integer from the input string
-      if i==0 or dp[0]>s[i]:  # if integer read is smallest so far, store it as best IS of length 1
+   for i in range(len(s)):                # read each integer from the input string
+      if i==0 or dp[0]>s[i]:              # if integer read is smallest so far, store it as best IS of length 1
          dp[0]=s[i]
-      elif s[i]>dp[k][-1]:    # if integer read is largest so far, append with the LIS to form the new LIS
+      elif s[i]>dp[k][-1]:                # if integer read is largest so far, append with the LIS to form the new LIS
          dp[k+1]=dp[k]+s[i]
          k += 1
-      else:                   # otherwise, perform binary search to find the largest best IS smaller to the current integer, and append to it
-         ind=binarySearch(1,k-1,s[i])
-         if ind == -1:
-            print(dp)
-            sys.exit("Something wrong in logic. String ="+s+" Error while processing char="+s[i]+' in position ' + str(i))
-         if ind >0:
+      else:                               # otherwise, perform binary search to find the largest best IS smaller to the current integer, and append to it
+         ind=binarySearch(0,k,s[i])
+         if ind >=0:
             dp[ind+1]=dp[ind]+s[i]
+    
+   return k+1                             # return largest non-empty index of dp (adding 1 because indexing starts with 0)
 
-   return k+1                 # return largest non-empty index of dp (adding 1 because indexing starts with 0)
-
-'''
-Functions prepData and testit are used for testing purpose
-'''
-def prepData(seq):
-
-   global dp,s
-
-   s=seq
-   dp=['' for _ in range(len(s))]   # allocate dynamic programming array to store minimum LIS of all possible lengths 
-   return LIS()
-   
-def testit():
-   
-   l=prepData('123456789')
-   if [l,dp[l-1]]==[9,'123456789']: print('ok')
-   else: print("not ok. Length of LIS of 123456789 is ", l, 'check dp=',dp)
-
-   l=prepData('121212')
-   if [l,dp[l-1]]==[2,'12']: print('ok')
-   else: print("not ok. Length of LIS of 12 is ", l, 'check dp=',dp)
-
-   l=prepData('31276')
-   if l==3: print('ok')
-   else: print("not ok. Length of LIS of 31276 is ", l, 'check dp=',dp)
-
-   l=prepData('126793548')
-   if [l,dp[l-1]] in ([5,'12679'],[5,'12358'],[5,'12348']): print('ok')
-   else: print("not ok. Length of LIS of 126793548 is ", l, 'check dp=',dp)
-   
 ''' This is the main function. '''
 if __name__ == '__main__':
-
-   # testit()                      # uncomment this line and comment rest of the lines, for testing 
 
    s=input("Enter a string of integers:")
    dp=['' for _ in range(len(s))]  # allocate dynamic programming array to store best LIS of all possible lengths 
