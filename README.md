@@ -7,3 +7,5 @@ largestCommonString.py --> Use dynamic programming to find longest common subseq
 LISInteger_n2.py --> Use dynamic programming to find the longest increasing sequence can be formed from a given string of integers in input. Time complexity O(n^2).
 
 LISInteger - nlogn.py -> Finds longest increasing integer sequence in a given integer string in O(n log n) time complexity.
+
+longestPallindrome.py -> Finds the longest palindromic subsequence, given an input string. Uses dynamic programming for better performance.
